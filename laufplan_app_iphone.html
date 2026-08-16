@@ -1,0 +1,1444 @@
+<!doctype html><html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5d55d9"><title>Mein Laufplan</title>
+<style>
+:root{--bg:#f4f5f9;--card:#fff;--ink:#182033;--muted:#6d7585;--line:#e3e6ed;--accent:#5d55d9;--green:#35a36d;--easy:#edf8f1;--quality:#f0eeff;--long:#fff3df;--race:#ffe9ed;--strength:#eef0f3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;padding-bottom:85px}
+.app{max-width:900px;margin:auto}header{padding:calc(18px + env(safe-area-inset-top)) 18px 18px;background:linear-gradient(135deg,#171b2e,#6259dc);color:white;border-radius:0 0 28px 28px}
+.eyebrow{opacity:.75;font-size:13px}h1{font-size:34px;line-height:1.05;margin:5px 0}header p{margin:5px 0;opacity:.9}main{padding:14px}.view{display:none}.view.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #1820330a}.hero-card{background:linear-gradient(135deg,#fff,#f5f4ff)}h2{font-size:22px;margin:0 0 12px}h3{font-size:17px;margin:8px 0 5px}p{margin:5px 0;line-height:1.45}small,.muted{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:#f7f8fb;border-radius:13px;padding:12px}.stat b{display:block;font-size:22px;margin-top:3px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;background:var(--accent);color:#fff;border-radius:11px;padding:10px 13px;font-weight:700}.btn.secondary{background:#eef0f7;color:var(--ink)}.btn.danger{background:#707887}
+.tag{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;background:#fff;border:1px solid var(--line);font-weight:700}
+.nav{position:fixed;z-index:20;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:4px}
+.nav button{border:0;background:transparent;color:var(--muted);padding:7px 13px;border-radius:12px;font-size:12px;font-weight:700}.nav button.active{background:#eeedff;color:var(--accent)}
+.week{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:14px 0}.days{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.day{border:1px solid var(--line);border-radius:12px;padding:10px;min-height:230px;background:#fff}.day.easy{background:var(--easy)}.day.quality{background:var(--quality)}.day.long{background:var(--long)}.day.race{background:var(--race)}.day.strength{background:var(--strength)}.day.rest{background:#fafafa}
+.daytop{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}.daytop b{color:var(--ink)}.fields{display:grid;gap:5px;margin-top:8px}label{font-size:11px;color:var(--muted)}input,textarea{width:100%;border:1px solid #d5dae3;border-radius:8px;padding:7px;background:#fff}input[type=checkbox]{width:auto}textarea{min-height:42px;resize:vertical;margin-top:5px}.completed{outline:2px solid var(--green);opacity:.78}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}.filebtn{display:inline-flex;align-items:center;justify-content:center;border:0;background:#eef0f7;color:var(--ink);border-radius:11px;padding:10px 13px;font-weight:700}
+.list{display:grid;gap:8px}.listrow{background:#f7f8fb;border-radius:12px;padding:12px;display:flex;justify-content:space-between;gap:10px}
+@media(max-width:1050px){.days{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){main{padding:10px}.days{grid-template-columns:1fr}.week{padding:10px}.day{min-height:auto}}
+</style></head><body><div class="app">
+<header><div class="eyebrow">DEIN PERSÖNLICHER LAUFPLAN</div><h1>🏃‍♀️ Laufplan</h1><p>13 km am 25.10.2026 · Halbmarathon am 04.04.2027</p></header>
+<main>
+<section id="home" class="view active"><div class="card hero-card" id="todayCard"></div>
+<div class="card"><h2>📊 Fortschritt</h2><div class="stats"><div class="stat"><span class="muted">Läufe erledigt</span><b id="doneCount">0</b></div><div class="stat"><span class="muted">Diese Woche</span><b id="weekKm">0 km</b></div><div class="stat"><span class="muted">Längster Lauf</span><b id="longest">0 km</b></div><div class="stat"><span class="muted">Ø Pace</span><b id="avgPace">–</b></div></div></div>
+<div class="card"><h2>🎯 Deine Ziele</h2><div class="list"><div class="listrow"><span>13 km am 25.10.</span><b>~6:30/km</b></div><div class="listrow"><span>Halbmarathon am 04.04.</span><b>2:15–2:30 h</b></div></div></div></section>
+<section id="calendar" class="view"><h2>📅 Jeder Tag, jedes Datum</h2>
+<p>Die folgenden Karten sind der eigentliche Trainingskalender. Es gibt keinen „Woche 1“-Platzhalter: <b>jeder Lauf steht mit seinem exakten Datum da.</b></p>
+<section class="week">
+<h2>KW 34 · 17.08.2026 – 23.08.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-08-17">
+<div class="daytop"><b>Montag</b><span>17.08.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-08-18">
+<div class="daytop"><b>Dienstag</b><span>18.08.2026</span></div>
+<h3>Qualität</h3><p>10 min locker → 4×4 min @ 6:45–6:55/km → je 2 min locker → 10 min auslaufen</p><small>45–50 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-08-18.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-08-18.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-08-18.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-08-18.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-08-18.feel"></label>
+</div><textarea data-k="2026-08-18.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-08-19">
+<div class="daytop"><b>Mittwoch</b><span>19.08.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-08-19.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-08-20">
+<div class="daytop"><b>Donnerstag</b><span>20.08.2026</span></div>
+<h3>Easy Run</h3><p>5 km @ 7:15–7:45/km + 4×20 Sek. Steigerungen</p><small>38–42 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-08-20.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-08-20.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-08-20.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-08-20.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-08-20.feel"></label>
+</div><textarea data-k="2026-08-20.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-08-21">
+<div class="daytop"><b>Freitag</b><span>21.08.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-08-22">
+<div class="daytop"><b>Samstag</b><span>22.08.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-08-23">
+<div class="daytop"><b>Sonntag</b><span>23.08.2026</span></div>
+<h3>Long Run</h3><p>8 km locker @ 7:20–7:55/km</p><small>59–64 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-08-23.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-08-23.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-08-23.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-08-23.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-08-23.feel"></label>
+</div><textarea data-k="2026-08-23.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 35 · 24.08.2026 – 30.08.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-08-24">
+<div class="daytop"><b>Montag</b><span>24.08.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-08-25">
+<div class="daytop"><b>Dienstag</b><span>25.08.2026</span></div>
+<h3>Tempolauf</h3><p>10 min locker → 4×5 min @ 6:40–6:50/km → je 2 min locker → auslaufen</p><small>50–55 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-08-25.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-08-25.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-08-25.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-08-25.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-08-25.feel"></label>
+</div><textarea data-k="2026-08-25.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-08-26">
+<div class="daytop"><b>Mittwoch</b><span>26.08.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-08-26.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-08-27">
+<div class="daytop"><b>Donnerstag</b><span>27.08.2026</span></div>
+<h3>Easy Run</h3><p>5 km @ 7:15–7:45/km</p><small>36–39 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-08-27.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-08-27.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-08-27.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-08-27.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-08-27.feel"></label>
+</div><textarea data-k="2026-08-27.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-08-28">
+<div class="daytop"><b>Freitag</b><span>28.08.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-08-29">
+<div class="daytop"><b>Samstag</b><span>29.08.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-08-30">
+<div class="daytop"><b>Sonntag</b><span>30.08.2026</span></div>
+<h3>Long Run</h3><p>9 km locker @ 7:20–7:55/km</p><small>66–71 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-08-30.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-08-30.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-08-30.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-08-30.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-08-30.feel"></label>
+</div><textarea data-k="2026-08-30.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 36 · 31.08.2026 – 06.09.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-08-31">
+<div class="daytop"><b>Montag</b><span>31.08.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-09-01">
+<div class="daytop"><b>Dienstag</b><span>01.09.2026</span></div>
+<h3>Intervalle</h3><p>10 min locker → 5×3 min @ 6:20–6:35/km → je 2 min Trabpause → auslaufen</p><small>~50 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-01.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-01.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-01.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-01.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-01.feel"></label>
+</div><textarea data-k="2026-09-01.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-09-02">
+<div class="daytop"><b>Mittwoch</b><span>02.09.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-09-02.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-09-03">
+<div class="daytop"><b>Donnerstag</b><span>03.09.2026</span></div>
+<h3>Easy Run</h3><p>5–6 km @ 7:15–7:50/km</p><small>37–47 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-03.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-03.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-03.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-03.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-03.feel"></label>
+</div><textarea data-k="2026-09-03.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-09-04">
+<div class="daytop"><b>Freitag</b><span>04.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-09-05">
+<div class="daytop"><b>Samstag</b><span>05.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-09-06">
+<div class="daytop"><b>Sonntag</b><span>06.09.2026</span></div>
+<h3>Long Run</h3><p>10 km locker, gleichmäßig</p><small>73–78 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-06.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-06.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-06.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-06.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-06.feel"></label>
+</div><textarea data-k="2026-09-06.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 37 · 07.09.2026 – 13.09.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-09-07">
+<div class="daytop"><b>Montag</b><span>07.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-09-08">
+<div class="daytop"><b>Dienstag</b><span>08.09.2026</span></div>
+<h3>Tempolauf</h3><p>10 min locker → 3×8 min @ 6:35–6:45/km → je 3 min locker → auslaufen</p><small>50–55 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-08.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-08.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-08.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-08.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-08.feel"></label>
+</div><textarea data-k="2026-09-08.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-09-09">
+<div class="daytop"><b>Mittwoch</b><span>09.09.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-09-09.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-09-10">
+<div class="daytop"><b>Donnerstag</b><span>10.09.2026</span></div>
+<h3>Recovery Run</h3><p>5 km sehr locker @ 7:25–8:00/km</p><small>37–40 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-10.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-10.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-10.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-10.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-10.feel"></label>
+</div><textarea data-k="2026-09-10.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-09-11">
+<div class="daytop"><b>Freitag</b><span>11.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-09-12">
+<div class="daytop"><b>Samstag</b><span>12.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-09-13">
+<div class="daytop"><b>Sonntag</b><span>13.09.2026</span></div>
+<h3>Long Run</h3><p>8 km locker</p><small>59–64 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-13.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-13.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-13.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-13.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-13.feel"></label>
+</div><textarea data-k="2026-09-13.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 38 · 14.09.2026 – 20.09.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-09-14">
+<div class="daytop"><b>Montag</b><span>14.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-09-15">
+<div class="daytop"><b>Dienstag</b><span>15.09.2026</span></div>
+<h3>Tempo</h3><p>10 min locker → 4×5 min @ 6:20–6:30/km → je 2 min locker → auslaufen</p><small>50–55 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-15.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-15.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-15.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-15.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-15.feel"></label>
+</div><textarea data-k="2026-09-15.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-09-16">
+<div class="daytop"><b>Mittwoch</b><span>16.09.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-09-16.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-09-17">
+<div class="daytop"><b>Donnerstag</b><span>17.09.2026</span></div>
+<h3>Easy Run</h3><p>6 km locker @ 7:15–7:50/km</p><small>44–47 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-17.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-17.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-17.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-17.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-17.feel"></label>
+</div><textarea data-k="2026-09-17.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-09-18">
+<div class="daytop"><b>Freitag</b><span>18.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-09-19">
+<div class="daytop"><b>Samstag</b><span>19.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-09-20">
+<div class="daytop"><b>Sonntag</b><span>20.09.2026</span></div>
+<h3>Long Run</h3><p>11 km locker @ ca. 7:15–7:50/km</p><small>80–86 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-20.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-20.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-20.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-20.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-20.feel"></label>
+</div><textarea data-k="2026-09-20.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 39 · 21.09.2026 – 27.09.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-09-21">
+<div class="daytop"><b>Montag</b><span>21.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-09-22">
+<div class="daytop"><b>Dienstag</b><span>22.09.2026</span></div>
+<h3>Intervalle</h3><p>10 min locker → 6×3 min @ 6:05–6:20/km → je 2 min locker → auslaufen</p><small>52–58 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-22.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-22.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-22.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-22.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-22.feel"></label>
+</div><textarea data-k="2026-09-22.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-09-23">
+<div class="daytop"><b>Mittwoch</b><span>23.09.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-09-23.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-09-24">
+<div class="daytop"><b>Donnerstag</b><span>24.09.2026</span></div>
+<h3>Easy Run</h3><p>5–6 km sehr locker</p><small>37–47 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-24.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-24.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-24.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-24.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-24.feel"></label>
+</div><textarea data-k="2026-09-24.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-09-25">
+<div class="daytop"><b>Freitag</b><span>25.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-09-26">
+<div class="daytop"><b>Samstag</b><span>26.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-09-27">
+<div class="daytop"><b>Sonntag</b><span>27.09.2026</span></div>
+<h3>Long Run</h3><p>12 km locker; nur bei frischen Beinen letzte 1–2 km leicht zügiger</p><small>86–94 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-27.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-27.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-27.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-27.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-27.feel"></label>
+</div><textarea data-k="2026-09-27.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 40 · 28.09.2026 – 04.10.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-09-28">
+<div class="daytop"><b>Montag</b><span>28.09.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-09-29">
+<div class="daytop"><b>Dienstag</b><span>29.09.2026</span></div>
+<h3>Schwelle</h3><p>10 min locker → 2×12 min @ 6:25–6:35/km → 4 min locker → auslaufen</p><small>52–58 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-09-29.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-09-29.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-09-29.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-09-29.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-09-29.feel"></label>
+</div><textarea data-k="2026-09-29.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-09-30">
+<div class="daytop"><b>Mittwoch</b><span>30.09.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-09-30.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-10-01">
+<div class="daytop"><b>Donnerstag</b><span>01.10.2026</span></div>
+<h3>Easy + Steigerungen</h3><p>5 km locker + 4×20 Sek. Steigerungen</p><small>~40 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-01.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-01.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-01.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-01.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-01.feel"></label>
+</div><textarea data-k="2026-10-01.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-10-02">
+<div class="daytop"><b>Freitag</b><span>02.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-10-03">
+<div class="daytop"><b>Samstag</b><span>03.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-10-04">
+<div class="daytop"><b>Sonntag</b><span>04.10.2026</span></div>
+<h3>13-km-Test</h3><p>13 km locker. Distanz testen, nicht auf Zielpace drücken.</p><small>94–102 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-04.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-04.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-04.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-04.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-04.feel"></label>
+</div><textarea data-k="2026-10-04.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 41 · 05.10.2026 – 11.10.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-10-05">
+<div class="daytop"><b>Montag</b><span>05.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-10-06">
+<div class="daytop"><b>Dienstag</b><span>06.10.2026</span></div>
+<h3>Race-Pace-Intervalle</h3><p>10 min locker → 5×4 min @ 6:05–6:20/km → je 2 min locker → auslaufen</p><small>50–55 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-06.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-06.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-06.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-06.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-06.feel"></label>
+</div><textarea data-k="2026-10-06.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-10-07">
+<div class="daytop"><b>Mittwoch</b><span>07.10.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-10-07.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-10-08">
+<div class="daytop"><b>Donnerstag</b><span>08.10.2026</span></div>
+<h3>Easy Run</h3><p>5 km locker</p><small>37–40 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-08.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-08.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-08.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-08.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-08.feel"></label>
+</div><textarea data-k="2026-10-08.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-10-09">
+<div class="daytop"><b>Freitag</b><span>09.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-10-10">
+<div class="daytop"><b>Samstag</b><span>10.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-10-11">
+<div class="daytop"><b>Sonntag</b><span>11.10.2026</span></div>
+<h3>Long Run mit Endbeschleunigung</h3><p>11–12 km; letzte 3 km @ 6:30–6:40/km nur wenn frisch</p><small>82–92 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-11.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-11.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-11.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-11.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-11.feel"></label>
+</div><textarea data-k="2026-10-11.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 42 · 12.10.2026 – 18.10.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-10-12">
+<div class="daytop"><b>Montag</b><span>12.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-10-13">
+<div class="daytop"><b>Dienstag</b><span>13.10.2026</span></div>
+<h3>Kontrolliertes Tempo</h3><p>10 min locker → 3×8 min @ 6:20–6:30/km → je 3 min locker → auslaufen</p><small>48–54 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-13.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-13.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-13.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-13.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-13.feel"></label>
+</div><textarea data-k="2026-10-13.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-10-14">
+<div class="daytop"><b>Mittwoch</b><span>14.10.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-10-14.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-10-15">
+<div class="daytop"><b>Donnerstag</b><span>15.10.2026</span></div>
+<h3>Easy + Steigerungen</h3><p>5 km sehr locker + 3×20 Sek. Steigerungen</p><small>39–42 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-15.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-15.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-15.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-15.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-15.feel"></label>
+</div><textarea data-k="2026-10-15.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-10-16">
+<div class="daytop"><b>Freitag</b><span>16.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-10-17">
+<div class="daytop"><b>Samstag</b><span>17.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-10-18">
+<div class="daytop"><b>Sonntag</b><span>18.10.2026</span></div>
+<h3>Long Run</h3><p>8 km locker</p><small>59–64 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-18.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-18.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-18.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-18.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-18.feel"></label>
+</div><textarea data-k="2026-10-18.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 43 · 19.10.2026 – 25.10.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-10-19">
+<div class="daytop"><b>Montag</b><span>19.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-10-20">
+<div class="daytop"><b>Dienstag</b><span>20.10.2026</span></div>
+<h3>Aktivierung</h3><p>10 min locker → 3×5 min @ 6:15–6:30/km → je 2 min locker → auslaufen</p><small>40–45 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-20.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-20.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-20.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-20.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-20.feel"></label>
+</div><textarea data-k="2026-10-20.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-10-21">
+<div class="daytop"><b>Mittwoch</b><span>21.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-10-22">
+<div class="daytop"><b>Donnerstag</b><span>22.10.2026</span></div>
+<h3>Shake-out</h3><p>4–5 km sehr locker + 3 kurze Steigerungen</p><small>31–40 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-22.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-22.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-22.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-22.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-22.feel"></label>
+</div><textarea data-k="2026-10-22.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-10-23">
+<div class="daytop"><b>Freitag</b><span>23.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-10-24">
+<div class="daytop"><b>Samstag</b><span>24.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day race" data-date="2026-10-25">
+<div class="daytop"><b>Sonntag</b><span>25.10.2026</span></div>
+<h3>🏁 13-km-WETTKAMPF</h3><p>km 1–3: 6:35–6:40 · km 4–8: 6:25–6:35 · km 9–11: 6:20–6:30 · km 12–13: nach Gefühl</p><small>~1:23–1:27 · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-25.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-25.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-25.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-25.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-25.feel"></label>
+</div><textarea data-k="2026-10-25.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 44 · 26.10.2026 – 01.11.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-10-26">
+<div class="daytop"><b>Montag</b><span>26.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-10-27">
+<div class="daytop"><b>Dienstag</b><span>27.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-10-28">
+<div class="daytop"><b>Mittwoch</b><span>28.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-10-29">
+<div class="daytop"><b>Donnerstag</b><span>29.10.2026</span></div>
+<h3>Easy Run</h3><p>4–5 km sehr locker, nur wenn die Beine gut sind</p><small>32–40 min · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-10-29.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-10-29.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-10-29.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-10-29.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-10-29.feel"></label>
+</div><textarea data-k="2026-10-29.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-10-30">
+<div class="daytop"><b>Freitag</b><span>30.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-10-31">
+<div class="daytop"><b>Samstag</b><span>31.10.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-11-01">
+<div class="daytop"><b>Sonntag</b><span>01.11.2026</span></div>
+<h3>Long Run</h3><p>6–8 km sehr locker</p><small>45–62 min · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-01.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-01.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-01.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-01.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-01.feel"></label>
+</div><textarea data-k="2026-11-01.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 45 · 02.11.2026 – 08.11.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-11-02">
+<div class="daytop"><b>Montag</b><span>02.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-11-03">
+<div class="daytop"><b>Dienstag</b><span>03.11.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-03.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-03.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-03.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-03.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-03.feel"></label>
+</div><textarea data-k="2026-11-03.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-11-04">
+<div class="daytop"><b>Mittwoch</b><span>04.11.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-11-04.done"> Erledigt</label>
+</div><div class="day quality" data-date="2026-11-05">
+<div class="daytop"><b>Donnerstag</b><span>05.11.2026</span></div>
+<h3>Kurze Tempos</h3><p>6×2 min zügig / 2 min locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-05.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-05.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-05.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-05.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-05.feel"></label>
+</div><textarea data-k="2026-11-05.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-11-06">
+<div class="daytop"><b>Freitag</b><span>06.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-11-07">
+<div class="daytop"><b>Samstag</b><span>07.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-11-08">
+<div class="daytop"><b>Sonntag</b><span>08.11.2026</span></div>
+<h3>Long Run</h3><p>9–12 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-08.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-08.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-08.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-08.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-08.feel"></label>
+</div><textarea data-k="2026-11-08.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 46 · 09.11.2026 – 15.11.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-11-09">
+<div class="daytop"><b>Montag</b><span>09.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-11-10">
+<div class="daytop"><b>Dienstag</b><span>10.11.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-10.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-10.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-10.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-10.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-10.feel"></label>
+</div><textarea data-k="2026-11-10.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-11-11">
+<div class="daytop"><b>Mittwoch</b><span>11.11.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-11-11.done"> Erledigt</label>
+</div><div class="day quality" data-date="2026-11-12">
+<div class="daytop"><b>Donnerstag</b><span>12.11.2026</span></div>
+<h3>Kurze Tempos</h3><p>5×3 min zügig / 2 min locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-12.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-12.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-12.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-12.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-12.feel"></label>
+</div><textarea data-k="2026-11-12.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-11-13">
+<div class="daytop"><b>Freitag</b><span>13.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-11-14">
+<div class="daytop"><b>Samstag</b><span>14.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-11-15">
+<div class="daytop"><b>Sonntag</b><span>15.11.2026</span></div>
+<h3>Long Run</h3><p>10–12 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-15.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-15.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-15.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-15.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-15.feel"></label>
+</div><textarea data-k="2026-11-15.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 47 · 16.11.2026 – 22.11.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-11-16">
+<div class="daytop"><b>Montag</b><span>16.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-11-17">
+<div class="daytop"><b>Dienstag</b><span>17.11.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-17.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-17.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-17.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-17.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-17.feel"></label>
+</div><textarea data-k="2026-11-17.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-11-18">
+<div class="daytop"><b>Mittwoch</b><span>18.11.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-11-18.done"> Erledigt</label>
+</div><div class="day quality" data-date="2026-11-19">
+<div class="daytop"><b>Donnerstag</b><span>19.11.2026</span></div>
+<h3>Tempo</h3><p>20 min kontrolliert zügig innerhalb eines 45–55-min-Laufs</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-19.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-19.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-19.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-19.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-19.feel"></label>
+</div><textarea data-k="2026-11-19.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-11-20">
+<div class="daytop"><b>Freitag</b><span>20.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-11-21">
+<div class="daytop"><b>Samstag</b><span>21.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-11-22">
+<div class="daytop"><b>Sonntag</b><span>22.11.2026</span></div>
+<h3>Long Run</h3><p>10–13 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-22.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-22.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-22.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-22.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-22.feel"></label>
+</div><textarea data-k="2026-11-22.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 48 · 23.11.2026 – 29.11.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-11-23">
+<div class="daytop"><b>Montag</b><span>23.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-11-24">
+<div class="daytop"><b>Dienstag</b><span>24.11.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-24.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-24.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-24.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-24.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-24.feel"></label>
+</div><textarea data-k="2026-11-24.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-11-25">
+<div class="daytop"><b>Mittwoch</b><span>25.11.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-11-25.done"> Erledigt</label>
+</div><div class="day quality" data-date="2026-11-26">
+<div class="daytop"><b>Donnerstag</b><span>26.11.2026</span></div>
+<h3>Hügel/Intervalle</h3><p>6×2–3 min zügig, locker zurück</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-26.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-26.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-26.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-26.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-26.feel"></label>
+</div><textarea data-k="2026-11-26.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-11-27">
+<div class="daytop"><b>Freitag</b><span>27.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-11-28">
+<div class="daytop"><b>Samstag</b><span>28.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-11-29">
+<div class="daytop"><b>Sonntag</b><span>29.11.2026</span></div>
+<h3>Long Run</h3><p>11–13 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-11-29.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-11-29.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-11-29.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-11-29.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-11-29.feel"></label>
+</div><textarea data-k="2026-11-29.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 49 · 30.11.2026 – 06.12.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-11-30">
+<div class="daytop"><b>Montag</b><span>30.11.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-12-01">
+<div class="daytop"><b>Dienstag</b><span>01.12.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-01.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-01.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-01.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-01.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-01.feel"></label>
+</div><textarea data-k="2026-12-01.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-12-02">
+<div class="daytop"><b>Mittwoch</b><span>02.12.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-12-02.done"> Erledigt</label>
+</div><div class="day quality" data-date="2026-12-03">
+<div class="daytop"><b>Donnerstag</b><span>03.12.2026</span></div>
+<h3>Tempo/Hügel</h3><p>45–60 min kontrolliert</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-03.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-03.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-03.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-03.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-03.feel"></label>
+</div><textarea data-k="2026-12-03.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-12-04">
+<div class="daytop"><b>Freitag</b><span>04.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-12-05">
+<div class="daytop"><b>Samstag</b><span>05.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-12-06">
+<div class="daytop"><b>Sonntag</b><span>06.12.2026</span></div>
+<h3>Long Run</h3><p>10–14 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-06.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-06.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-06.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-06.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-06.feel"></label>
+</div><textarea data-k="2026-12-06.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 50 · 07.12.2026 – 13.12.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-12-07">
+<div class="daytop"><b>Montag</b><span>07.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-12-08">
+<div class="daytop"><b>Dienstag</b><span>08.12.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-08.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-08.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-08.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-08.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-08.feel"></label>
+</div><textarea data-k="2026-12-08.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-12-09">
+<div class="daytop"><b>Mittwoch</b><span>09.12.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-12-09.done"> Erledigt</label>
+</div><div class="day quality" data-date="2026-12-10">
+<div class="daytop"><b>Donnerstag</b><span>10.12.2026</span></div>
+<h3>Tempo</h3><p>3×8 min zügig / 3 min locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-10.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-10.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-10.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-10.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-10.feel"></label>
+</div><textarea data-k="2026-12-10.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-12-11">
+<div class="daytop"><b>Freitag</b><span>11.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-12-12">
+<div class="daytop"><b>Samstag</b><span>12.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-12-13">
+<div class="daytop"><b>Sonntag</b><span>13.12.2026</span></div>
+<h3>Long Run</h3><p>11–14 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-13.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-13.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-13.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-13.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-13.feel"></label>
+</div><textarea data-k="2026-12-13.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 51 · 14.12.2026 – 20.12.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-12-14">
+<div class="daytop"><b>Montag</b><span>14.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-12-15">
+<div class="daytop"><b>Dienstag</b><span>15.12.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-15.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-15.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-15.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-15.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-15.feel"></label>
+</div><textarea data-k="2026-12-15.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-12-16">
+<div class="daytop"><b>Mittwoch</b><span>16.12.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-12-16.done"> Erledigt</label>
+</div><div class="day quality" data-date="2026-12-17">
+<div class="daytop"><b>Donnerstag</b><span>17.12.2026</span></div>
+<h3>Hügel/Intervalle</h3><p>6×3 min zügig / 2 min locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-17.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-17.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-17.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-17.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-17.feel"></label>
+</div><textarea data-k="2026-12-17.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-12-18">
+<div class="daytop"><b>Freitag</b><span>18.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-12-19">
+<div class="daytop"><b>Samstag</b><span>19.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-12-20">
+<div class="daytop"><b>Sonntag</b><span>20.12.2026</span></div>
+<h3>Long Run</h3><p>12–14 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-20.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-20.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-20.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-20.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-20.feel"></label>
+</div><textarea data-k="2026-12-20.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 52 · 21.12.2026 – 27.12.2026</h2>
+<div class="days"><div class="day rest" data-date="2026-12-21">
+<div class="daytop"><b>Montag</b><span>21.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2026-12-22">
+<div class="daytop"><b>Dienstag</b><span>22.12.2026</span></div>
+<h3>Easy Run</h3><p>5–6 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-22.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-22.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-22.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-22.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-22.feel"></label>
+</div><textarea data-k="2026-12-22.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-12-23">
+<div class="daytop"><b>Mittwoch</b><span>23.12.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-12-23.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-12-24">
+<div class="daytop"><b>Donnerstag</b><span>24.12.2026</span></div>
+<h3>Optional</h3><p>30–40 min locker + 4 kurze Steigerungen</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-24.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-24.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-24.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-24.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-24.feel"></label>
+</div><textarea data-k="2026-12-24.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2026-12-25">
+<div class="daytop"><b>Freitag</b><span>25.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2026-12-26">
+<div class="daytop"><b>Samstag</b><span>26.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2026-12-27">
+<div class="daytop"><b>Sonntag</b><span>27.12.2026</span></div>
+<h3>Long Run</h3><p>10–12 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-27.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-27.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-27.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-27.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-27.feel"></label>
+</div><textarea data-k="2026-12-27.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 53 · 28.12.2026 – 03.01.2027</h2>
+<div class="days"><div class="day rest" data-date="2026-12-28">
+<div class="daytop"><b>Montag</b><span>28.12.2026</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2026-12-29">
+<div class="daytop"><b>Dienstag</b><span>29.12.2026</span></div>
+<h3>Schwelle</h3><p>3×10 min kontrolliert zügig</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-29.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-29.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-29.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-29.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-29.feel"></label>
+</div><textarea data-k="2026-12-29.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2026-12-30">
+<div class="daytop"><b>Mittwoch</b><span>30.12.2026</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2026-12-30.done"> Erledigt</label>
+</div><div class="day easy" data-date="2026-12-31">
+<div class="daytop"><b>Donnerstag</b><span>31.12.2026</span></div>
+<h3>Easy Run</h3><p>5–7 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2026-12-31.done"> Erledigt</label>
+<label>Distanz km<input data-k="2026-12-31.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2026-12-31.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2026-12-31.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2026-12-31.feel"></label>
+</div><textarea data-k="2026-12-31.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-01-01">
+<div class="daytop"><b>Freitag</b><span>01.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-01-02">
+<div class="daytop"><b>Samstag</b><span>02.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-01-03">
+<div class="daytop"><b>Sonntag</b><span>03.01.2027</span></div>
+<h3>Long Run</h3><p>12–16 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-03.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-03.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-03.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-03.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-03.feel"></label>
+</div><textarea data-k="2027-01-03.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 1 · 04.01.2027 – 10.01.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-01-04">
+<div class="daytop"><b>Montag</b><span>04.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-01-05">
+<div class="daytop"><b>Dienstag</b><span>05.01.2027</span></div>
+<h3>Schwelle</h3><p>2×12 min kontrolliert zügig</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-05.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-05.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-05.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-05.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-05.feel"></label>
+</div><textarea data-k="2027-01-05.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-01-06">
+<div class="daytop"><b>Mittwoch</b><span>06.01.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-01-06.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-01-07">
+<div class="daytop"><b>Donnerstag</b><span>07.01.2027</span></div>
+<h3>Easy Run</h3><p>6–7 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-07.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-07.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-07.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-07.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-07.feel"></label>
+</div><textarea data-k="2027-01-07.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-01-08">
+<div class="daytop"><b>Freitag</b><span>08.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-01-09">
+<div class="daytop"><b>Samstag</b><span>09.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-01-10">
+<div class="daytop"><b>Sonntag</b><span>10.01.2027</span></div>
+<h3>Long Run</h3><p>13–16 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-10.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-10.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-10.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-10.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-10.feel"></label>
+</div><textarea data-k="2027-01-10.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 2 · 11.01.2027 – 17.01.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-01-11">
+<div class="daytop"><b>Montag</b><span>11.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-01-12">
+<div class="daytop"><b>Dienstag</b><span>12.01.2027</span></div>
+<h3>Tempo</h3><p>4×6 min zügig / 2 min locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-12.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-12.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-12.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-12.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-12.feel"></label>
+</div><textarea data-k="2027-01-12.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-01-13">
+<div class="daytop"><b>Mittwoch</b><span>13.01.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-01-13.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-01-14">
+<div class="daytop"><b>Donnerstag</b><span>14.01.2027</span></div>
+<h3>Easy Run</h3><p>6–7 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-14.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-14.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-14.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-14.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-14.feel"></label>
+</div><textarea data-k="2027-01-14.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-01-15">
+<div class="daytop"><b>Freitag</b><span>15.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-01-16">
+<div class="daytop"><b>Samstag</b><span>16.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-01-17">
+<div class="daytop"><b>Sonntag</b><span>17.01.2027</span></div>
+<h3>Long Run</h3><p>14–17 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-17.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-17.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-17.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-17.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-17.feel"></label>
+</div><textarea data-k="2027-01-17.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 3 · 18.01.2027 – 24.01.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-01-18">
+<div class="daytop"><b>Montag</b><span>18.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-01-19">
+<div class="daytop"><b>Dienstag</b><span>19.01.2027</span></div>
+<h3>HM-nah</h3><p>2×15 min kontrolliert im HM-nahen Tempo</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-19.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-19.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-19.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-19.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-19.feel"></label>
+</div><textarea data-k="2027-01-19.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-01-20">
+<div class="daytop"><b>Mittwoch</b><span>20.01.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-01-20.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-01-21">
+<div class="daytop"><b>Donnerstag</b><span>21.01.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-21.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-21.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-21.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-21.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-21.feel"></label>
+</div><textarea data-k="2027-01-21.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-01-22">
+<div class="daytop"><b>Freitag</b><span>22.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-01-23">
+<div class="daytop"><b>Samstag</b><span>23.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-01-24">
+<div class="daytop"><b>Sonntag</b><span>24.01.2027</span></div>
+<h3>Long Run</h3><p>14–17 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-24.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-24.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-24.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-24.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-24.feel"></label>
+</div><textarea data-k="2027-01-24.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 4 · 25.01.2027 – 31.01.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-01-25">
+<div class="daytop"><b>Montag</b><span>25.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-01-26">
+<div class="daytop"><b>Dienstag</b><span>26.01.2027</span></div>
+<h3>Schwelle</h3><p>3×8 min zügig</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-26.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-26.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-26.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-26.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-26.feel"></label>
+</div><textarea data-k="2027-01-26.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-01-27">
+<div class="daytop"><b>Mittwoch</b><span>27.01.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-01-27.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-01-28">
+<div class="daytop"><b>Donnerstag</b><span>28.01.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-28.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-28.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-28.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-28.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-28.feel"></label>
+</div><textarea data-k="2027-01-28.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-01-29">
+<div class="daytop"><b>Freitag</b><span>29.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-01-30">
+<div class="daytop"><b>Samstag</b><span>30.01.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-01-31">
+<div class="daytop"><b>Sonntag</b><span>31.01.2027</span></div>
+<h3>Long Run</h3><p>15–17 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-01-31.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-01-31.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-01-31.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-01-31.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-01-31.feel"></label>
+</div><textarea data-k="2027-01-31.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 5 · 01.02.2027 – 07.02.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-02-01">
+<div class="daytop"><b>Montag</b><span>01.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-02-02">
+<div class="daytop"><b>Dienstag</b><span>02.02.2027</span></div>
+<h3>HM-spezifisch</h3><p>2×15 min HM-nah</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-02.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-02.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-02.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-02.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-02.feel"></label>
+</div><textarea data-k="2027-02-02.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-02-03">
+<div class="daytop"><b>Mittwoch</b><span>03.02.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-02-03.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-02-04">
+<div class="daytop"><b>Donnerstag</b><span>04.02.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-04.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-04.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-04.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-04.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-04.feel"></label>
+</div><textarea data-k="2027-02-04.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-02-05">
+<div class="daytop"><b>Freitag</b><span>05.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-02-06">
+<div class="daytop"><b>Samstag</b><span>06.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-02-07">
+<div class="daytop"><b>Sonntag</b><span>07.02.2027</span></div>
+<h3>Long Run</h3><p>15–18 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-07.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-07.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-07.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-07.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-07.feel"></label>
+</div><textarea data-k="2027-02-07.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 6 · 08.02.2027 – 14.02.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-02-08">
+<div class="daytop"><b>Montag</b><span>08.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-02-09">
+<div class="daytop"><b>Dienstag</b><span>09.02.2027</span></div>
+<h3>Intervalle</h3><p>5×5 min zügig / 2 min locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-09.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-09.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-09.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-09.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-09.feel"></label>
+</div><textarea data-k="2027-02-09.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-02-10">
+<div class="daytop"><b>Mittwoch</b><span>10.02.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-02-10.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-02-11">
+<div class="daytop"><b>Donnerstag</b><span>11.02.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-11.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-11.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-11.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-11.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-11.feel"></label>
+</div><textarea data-k="2027-02-11.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-02-12">
+<div class="daytop"><b>Freitag</b><span>12.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-02-13">
+<div class="daytop"><b>Samstag</b><span>13.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-02-14">
+<div class="daytop"><b>Sonntag</b><span>14.02.2027</span></div>
+<h3>Long Run</h3><p>16–18 km; letzter Abschnitt leicht zügiger</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-14.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-14.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-14.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-14.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-14.feel"></label>
+</div><textarea data-k="2027-02-14.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 7 · 15.02.2027 – 21.02.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-02-15">
+<div class="daytop"><b>Montag</b><span>15.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-02-16">
+<div class="daytop"><b>Dienstag</b><span>16.02.2027</span></div>
+<h3>HM-Tempo</h3><p>3×10 min HM-nah / 3 min locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-16.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-16.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-16.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-16.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-16.feel"></label>
+</div><textarea data-k="2027-02-16.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-02-17">
+<div class="daytop"><b>Mittwoch</b><span>17.02.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-02-17.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-02-18">
+<div class="daytop"><b>Donnerstag</b><span>18.02.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-18.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-18.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-18.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-18.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-18.feel"></label>
+</div><textarea data-k="2027-02-18.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-02-19">
+<div class="daytop"><b>Freitag</b><span>19.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-02-20">
+<div class="daytop"><b>Samstag</b><span>20.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-02-21">
+<div class="daytop"><b>Sonntag</b><span>21.02.2027</span></div>
+<h3>Long Run</h3><p>15–18 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-21.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-21.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-21.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-21.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-21.feel"></label>
+</div><textarea data-k="2027-02-21.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 8 · 22.02.2027 – 28.02.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-02-22">
+<div class="daytop"><b>Montag</b><span>22.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-02-23">
+<div class="daytop"><b>Dienstag</b><span>23.02.2027</span></div>
+<h3>Schwelle</h3><p>20–25 min kontrolliert zügig</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-23.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-23.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-23.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-23.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-23.feel"></label>
+</div><textarea data-k="2027-02-23.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-02-24">
+<div class="daytop"><b>Mittwoch</b><span>24.02.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-02-24.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-02-25">
+<div class="daytop"><b>Donnerstag</b><span>25.02.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-25.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-25.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-25.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-25.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-25.feel"></label>
+</div><textarea data-k="2027-02-25.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-02-26">
+<div class="daytop"><b>Freitag</b><span>26.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-02-27">
+<div class="daytop"><b>Samstag</b><span>27.02.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-02-28">
+<div class="daytop"><b>Sonntag</b><span>28.02.2027</span></div>
+<h3>Long Run</h3><p>16–18 km; ggf. 3–4 km zügiger Schluss</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-02-28.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-02-28.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-02-28.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-02-28.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-02-28.feel"></label>
+</div><textarea data-k="2027-02-28.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 9 · 01.03.2027 – 07.03.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-03-01">
+<div class="daytop"><b>Montag</b><span>01.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-03-02">
+<div class="daytop"><b>Dienstag</b><span>02.03.2027</span></div>
+<h3>Tempo</h3><p>4×8 min HM-nah</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-02.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-02.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-02.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-02.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-02.feel"></label>
+</div><textarea data-k="2027-03-02.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-03-03">
+<div class="daytop"><b>Mittwoch</b><span>03.03.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-03-03.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-03-04">
+<div class="daytop"><b>Donnerstag</b><span>04.03.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-04.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-04.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-04.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-04.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-04.feel"></label>
+</div><textarea data-k="2027-03-04.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-03-05">
+<div class="daytop"><b>Freitag</b><span>05.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-03-06">
+<div class="daytop"><b>Samstag</b><span>06.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-03-07">
+<div class="daytop"><b>Sonntag</b><span>07.03.2027</span></div>
+<h3>Long Run</h3><p>17–19 km locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-07.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-07.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-07.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-07.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-07.feel"></label>
+</div><textarea data-k="2027-03-07.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 10 · 08.03.2027 – 14.03.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-03-08">
+<div class="daytop"><b>Montag</b><span>08.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-03-09">
+<div class="daytop"><b>Dienstag</b><span>09.03.2027</span></div>
+<h3>HM-Tempo</h3><p>2×15 min HM-nah</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-09.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-09.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-09.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-09.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-09.feel"></label>
+</div><textarea data-k="2027-03-09.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-03-10">
+<div class="daytop"><b>Mittwoch</b><span>10.03.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-03-10.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-03-11">
+<div class="daytop"><b>Donnerstag</b><span>11.03.2027</span></div>
+<h3>Easy Run</h3><p>6–8 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-11.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-11.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-11.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-11.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-11.feel"></label>
+</div><textarea data-k="2027-03-11.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-03-12">
+<div class="daytop"><b>Freitag</b><span>12.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-03-13">
+<div class="daytop"><b>Samstag</b><span>13.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-03-14">
+<div class="daytop"><b>Sonntag</b><span>14.03.2027</span></div>
+<h3>Long Run</h3><p>16–19 km mit einzelnen HM-nahen Abschnitten</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-14.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-14.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-14.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-14.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-14.feel"></label>
+</div><textarea data-k="2027-03-14.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 11 · 15.03.2027 – 21.03.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-03-15">
+<div class="daytop"><b>Montag</b><span>15.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-03-16">
+<div class="daytop"><b>Dienstag</b><span>16.03.2027</span></div>
+<h3>Letzter großer Reiz</h3><p>5×5 min zügig / 2 min locker</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-16.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-16.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-16.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-16.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-16.feel"></label>
+</div><textarea data-k="2027-03-16.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-03-17">
+<div class="daytop"><b>Mittwoch</b><span>17.03.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-03-17.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-03-18">
+<div class="daytop"><b>Donnerstag</b><span>18.03.2027</span></div>
+<h3>Easy Run</h3><p>6–7 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-18.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-18.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-18.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-18.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-18.feel"></label>
+</div><textarea data-k="2027-03-18.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-03-19">
+<div class="daytop"><b>Freitag</b><span>19.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-03-20">
+<div class="daytop"><b>Samstag</b><span>20.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-03-21">
+<div class="daytop"><b>Sonntag</b><span>21.03.2027</span></div>
+<h3>Long Run</h3><p>15–17 km entspannt</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-21.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-21.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-21.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-21.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-21.feel"></label>
+</div><textarea data-k="2027-03-21.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 12 · 22.03.2027 – 28.03.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-03-22">
+<div class="daytop"><b>Montag</b><span>22.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-03-23">
+<div class="daytop"><b>Dienstag</b><span>23.03.2027</span></div>
+<h3>Letzte Aktivierung</h3><p>40–50 min mit kurzen Abschnitten im HM-Zieltempo</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-23.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-23.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-23.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-23.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-23.feel"></label>
+</div><textarea data-k="2027-03-23.note" placeholder="Notizen"></textarea>
+</div><div class="day strength" data-date="2027-03-24">
+<div class="daytop"><b>Mittwoch</b><span>24.03.2027</span></div>
+<h3>Beine &amp; Rumpf</h3><p>45–60 min moderat: Split Squats/Kniebeuge, Hüftstreckung, Waden, Core; nicht bis zum Muskelversagen.</p><small>45–60 min</small><label class="done"><input type="checkbox" data-k="2027-03-24.done"> Erledigt</label>
+</div><div class="day easy" data-date="2027-03-25">
+<div class="daytop"><b>Donnerstag</b><span>25.03.2027</span></div>
+<h3>Easy Run</h3><p>5–6 km locker</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-25.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-25.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-25.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-25.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-25.feel"></label>
+</div><textarea data-k="2027-03-25.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-03-26">
+<div class="daytop"><b>Freitag</b><span>26.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-03-27">
+<div class="daytop"><b>Samstag</b><span>27.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day long" data-date="2027-03-28">
+<div class="daytop"><b>Sonntag</b><span>28.03.2027</span></div>
+<h3>Letzter längerer Lauf</h3><p>10–12 km locker, nicht mehr belasten</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-28.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-28.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-28.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-28.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-28.feel"></label>
+</div><textarea data-k="2027-03-28.note" placeholder="Notizen"></textarea>
+</div></div>
+</section><section class="week">
+<h2>KW 13 · 29.03.2027 – 04.04.2027</h2>
+<div class="days"><div class="day rest" data-date="2027-03-29">
+<div class="daytop"><b>Montag</b><span>29.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day quality" data-date="2027-03-30">
+<div class="daytop"><b>Dienstag</b><span>30.03.2027</span></div>
+<h3>Kurz &amp; frisch</h3><p>30–40 min mit 3×4 min zügig</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-03-30.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-03-30.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-03-30.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-03-30.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-03-30.feel"></label>
+</div><textarea data-k="2027-03-30.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-03-31">
+<div class="daytop"><b>Mittwoch</b><span>31.03.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day easy" data-date="2027-04-01">
+<div class="daytop"><b>Donnerstag</b><span>01.04.2027</span></div>
+<h3>Shake-out</h3><p>4–5 km sehr locker + 3 kurze Steigerungen</p><small>siehe Einheit · Priorität B</small><div class="fields">
+<label><input type="checkbox" data-k="2027-04-01.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-04-01.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-04-01.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-04-01.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-04-01.feel"></label>
+</div><textarea data-k="2027-04-01.note" placeholder="Notizen"></textarea>
+</div><div class="day rest" data-date="2027-04-02">
+<div class="daytop"><b>Freitag</b><span>02.04.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day rest" data-date="2027-04-03">
+<div class="daytop"><b>Samstag</b><span>03.04.2027</span></div>
+<h3>Ruhe / Mobility</h3><p>Kein Lauf. Optional 10–20 min Mobility oder Spaziergang.</p><small>—</small>
+</div><div class="day race" data-date="2027-04-04">
+<div class="daytop"><b>Sonntag</b><span>04.04.2027</span></div>
+<h3>🏁 HALBMARATHON</h3><p>21,1 km · Zielkorridor 2:15–2:30 h; endgültige Zielpace nach Winterform</p><small>siehe Einheit · Priorität A</small><div class="fields">
+<label><input type="checkbox" data-k="2027-04-04.done"> Erledigt</label>
+<label>Distanz km<input data-k="2027-04-04.dist" placeholder="z. B. 8,0"></label>
+<label>Zeit<input data-k="2027-04-04.time" placeholder="z. B. 58:20"></label>
+<label>Pace<input data-k="2027-04-04.pace" placeholder="z. B. 7:18"></label>
+<label>Gefühl 1–5<input type="number" min="1" max="5" data-k="2027-04-04.feel"></label>
+</div><textarea data-k="2027-04-04.note" placeholder="Notizen"></textarea>
+</div></div>
+</section>
+</section>
+<section id="progress" class="view"><div class="card"><h2>📈 Trainingsfortschritt</h2><div id="progressText"></div></div>
+<div class="card"><h2>💡 Plan anpassen</h2><p>Wenn mehrere lockere Läufe deutlich leichter werden, deine Pace bei ähnlicher Belastung sinkt oder du Einheiten wiederholt auslassen musst, können wir die folgenden Wochen anpassen.</p><p>Bei Hüft-/Beinbeschwerden: Tempo reduzieren bzw. Einheit auslassen und nicht „nachholen“.</p></div></section>
+<section id="data" class="view"><div class="card"><h2>💾 Deine Trainingsdaten</h2><p class="muted">Einträge werden automatisch auf diesem Gerät gespeichert. Für zusätzliche Sicherheit regelmäßig ein Backup erstellen.</p>
+<div class="toolbar"><button class="btn" id="saveBackup">💾 Backup speichern</button><label class="filebtn">📥 Backup laden<input id="loadBackup" type="file" accept=".json" hidden></label><button class="btn danger" id="resetData">🗑️ Daten löschen</button></div></div>
+<div class="card"><h2>📱 Home-Bildschirm</h2><p>Wenn die App über eine Web-Adresse geöffnet ist: Safari → <b>Teilen</b> → <b>Zum Home-Bildschirm</b> → <b>Hinzufügen</b>.</p><p class="muted">Für die endgültige App-Nutzung brauchen wir noch eine Web-Adresse; die lokale Datei ist dafür nicht zuverlässig genug.</p></div></section>
+</main>
+<nav class="nav"><button data-view="home" class="active">🏠<br>Heute</button><button data-view="calendar">📅<br>Plan</button><button data-view="progress">📈<br>Fortschritt</button><button data-view="data">💾<br>Daten</button></nav></div>
+<script>
+const KEY="laufplan_app_v1";let data=JSON.parse(localStorage.getItem(KEY)||"{}");
+const runDates=["2026-08-18", "2026-08-20", "2026-08-23", "2026-08-25", "2026-08-27", "2026-08-30", "2026-09-01", "2026-09-03", "2026-09-06", "2026-09-08", "2026-09-10", "2026-09-13", "2026-09-15", "2026-09-17", "2026-09-20", "2026-09-22", "2026-09-24", "2026-09-27", "2026-09-29", "2026-10-01", "2026-10-04", "2026-10-06", "2026-10-08", "2026-10-11", "2026-10-13", "2026-10-15", "2026-10-18", "2026-10-20", "2026-10-22", "2026-10-25", "2026-10-29", "2026-11-01", "2026-11-03", "2026-11-05", "2026-11-08", "2026-11-10", "2026-11-12", "2026-11-15", "2026-11-17", "2026-11-19", "2026-11-22", "2026-11-24", "2026-11-26", "2026-11-29", "2026-12-01", "2026-12-03", "2026-12-06", "2026-12-08", "2026-12-10", "2026-12-13", "2026-12-15", "2026-12-17", "2026-12-20", "2026-12-22", "2026-12-24", "2026-12-27", "2026-12-29", "2026-12-31", "2027-01-03", "2027-01-05", "2027-01-07", "2027-01-10", "2027-01-12", "2027-01-14", "2027-01-17", "2027-01-19", "2027-01-21", "2027-01-24", "2027-01-26", "2027-01-28", "2027-01-31", "2027-02-02", "2027-02-04", "2027-02-07", "2027-02-09", "2027-02-11", "2027-02-14", "2027-02-16", "2027-02-18", "2027-02-21", "2027-02-23", "2027-02-25", "2027-02-28", "2027-03-02", "2027-03-04", "2027-03-07", "2027-03-09", "2027-03-11", "2027-03-14", "2027-03-16", "2027-03-18", "2027-03-21", "2027-03-23", "2027-03-25", "2027-03-28", "2027-03-30", "2027-04-01", "2027-04-04"];
+function save(){localStorage.setItem(KEY,JSON.stringify(data));update()}
+function paceSec(v){const m=String(v||"").match(/^(\d+):(\d{1,2})$/);return m?+m[1]*60+ +m[2]:null}
+function fmt(sec){return sec?Math.floor(sec/60)+":"+String(Math.round(sec%60)).padStart(2,"0"):"–"}
+function update(){
+ let done=0,kms=[],paces=[];
+ document.querySelectorAll("[data-k]").forEach(el=>{let k=el.dataset.k;if(el.type==="checkbox")el.checked=!!data[k];else el.value=data[k]||"";if(el.type==="checkbox"&&el.checked){done++;el.closest(".day")?.classList.add("completed")}});
+ document.querySelectorAll("[data-k$='.dist']").forEach(el=>{let x=parseFloat(String(data[el.dataset.k]||"").replace(",","."));if(!isNaN(x))kms.push({d:x,date:el.dataset.k.slice(0,10)})});
+ document.querySelectorAll("[data-k$='.pace']").forEach(el=>{let x=paceSec(data[el.dataset.k]);if(x)paces.push(x)});
+ const now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));mon.setHours(0,0,0,0);const end=new Date(mon);end.setDate(mon.getDate()+7);
+ const wk=kms.filter(x=>{let d=new Date(x.date);return d>=mon&&d<end}).reduce((a,x)=>a+x.d,0);
+ document.getElementById("doneCount").textContent=done;document.getElementById("weekKm").textContent=wk.toFixed(1)+" km";document.getElementById("longest").textContent=(kms.length?Math.max(...kms.map(x=>x.d)).toFixed(1):"0")+" km";document.getElementById("avgPace").textContent=paces.length?fmt(paces.reduce((a,b)=>a+b,0)/paces.length):"–";
+ let upcoming=runDates.find(x=>x>=now.toISOString().slice(0,10));let title="Heute ist Ruhetag 🌿",desc="Erhole dich – optional Mobility.";
+ if(upcoming){let el=document.querySelector('[data-date="'+upcoming+'"]');if(el){title=el.querySelector("h3")?.textContent||"Nächster Lauf";desc=el.querySelector("p")?.textContent||""}}
+ document.getElementById("todayCard").innerHTML='<div class="tag">NÄCHSTE EINHEIT</div><h2>'+title+'</h2><p>'+desc+'</p><div class="actions"><button class="btn" onclick="goCalendar()">📅 Im Plan öffnen</button></div>';
+ document.getElementById("progressText").innerHTML='<p><b>'+done+'</b> Einheiten erledigt.</p><p>Aktuelle Wochenkilometer: <b>'+wk.toFixed(1)+' km</b>.</p><p>Längster eingetragener Lauf: <b>'+(kms.length?Math.max(...kms.map(x=>x.d)).toFixed(1):"0")+' km</b>.</p><p>Ø eingetragene Pace: <b>'+(paces.length?fmt(paces.reduce((a,b)=>a+b,0)/paces.length):"noch keine Daten")+'</b>.</p>';
+}
+document.querySelectorAll("[data-k]").forEach(el=>el.addEventListener("input",()=>{data[el.dataset.k]=el.type==="checkbox"?el.checked:el.value;save();if(el.type==="checkbox")el.closest(".day")?.classList.toggle("completed",el.checked)}));
+document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));document.getElementById(btn.dataset.view).classList.add("active");scrollTo(0,0)}));
+function goCalendar(){document.querySelector('[data-view="calendar"]').click()}
+document.getElementById("saveBackup").onclick=()=>{let blob=new Blob([JSON.stringify({version:1,createdAt:new Date().toISOString(),data},null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="laufplan-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};
+document.getElementById("loadBackup").onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.data)throw 0;if(confirm("Aktuelle Einträge durch dieses Backup ersetzen?")){data=x.data;save();location.reload()}}catch{alert("Das Backup konnte nicht gelesen werden.")}};r.readAsText(f)};
+document.getElementById("resetData").onclick=()=>{if(confirm("Alle Trainingsdaten auf diesem Gerät löschen?")){localStorage.removeItem(KEY);location.reload()}};
+update();
+</script></body></html>
